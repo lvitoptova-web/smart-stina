@@ -1,0 +1,111 @@
+<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Розрахунок матеріалів — Майстри відновлення</title><style>:root{font-family:Segoe UI,Arial,sans-serif;color:#183047;background:#eef4f9}*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(115deg,#102c4b,#176c92);color:white;padding:30px max(20px,calc((100vw - 1120px)/2))}header h1{margin:0;font-size:clamp(25px,4vw,40px)}header p{margin:8px 0}main{max-width:1120px;margin:24px auto;padding:0 16px}.panel{background:white;border-radius:16px;padding:22px;margin-bottom:18px;box-shadow:0 5px 22px #15365012}h2{margin-top:0;color:#16466b}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}label{display:block;font-size:14px;font-weight:650}input,select{width:100%;padding:11px;border:1px solid #c4d4e1;border-radius:9px;margin-top:6px;font:inherit}small,.muted{color:#60788a}button{background:#126b95;color:white;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;font-weight:700;margin:5px 8px 5px 0}button.secondary{background:#e6f0f6;color:#154c6e}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px;border-bottom:1px solid #e1e9f0;text-align:left}th{background:#e9f2f8}td:nth-child(n+3){text-align:right}th:nth-child(n+3){text-align:right}.scroll{overflow-x:auto}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}.stat{background:#e9f4fa;border-radius:12px;padding:14px}.stat strong{display:block;font-size:23px;color:#145a80}.warning{border-left:4px solid #d48d2c;background:#fff8e8;padding:12px;border-radius:7px;margin-top:12px}details{margin:12px 0}summary{cursor:pointer;font-weight:700}.price{max-width:100px}.footer{font-size:13px;color:#60788a}.grand-total th{background:#0e638b!important;color:#fff!important;font-size:22px;font-weight:800;padding:20px 14px;border-top:3px solid #073b59}.grand-total #total{font-size:27px;white-space:nowrap} @media print{button,.noprint{display:none!important}body{background:white}.panel{box-shadow:none;border:1px solid #ddd}header{print-color-adjust:exact}} 
+/* Яскрава палітра STEM — лише оформлення, логіка розрахунків незмінна */
+:root{color:#17294a;background:#edf4ff}
+body{background:linear-gradient(160deg,#e5f5ff 0%,#f4efff 52%,#eafff7 100%);min-height:100vh}
+header{background:linear-gradient(115deg,#1244bb 0%,#6842cf 52%,#e53c92 100%);border-bottom:6px solid #ffce36}
+header h1{text-shadow:0 2px 8px #16205b55}
+header p{color:#fff6b8}
+.panel{border:1px solid #d8e4ff;box-shadow:0 8px 24px #394c9620}
+h2{color:#1741aa;border-left:6px solid #ff9f1c;padding-left:12px}
+input,select{border:2px solid #bed2f7;background:#f9fbff;color:#162b4c}
+input:focus,select:focus{outline:3px solid #f9d16c;border-color:#6c47d9}
+button{background:linear-gradient(115deg,#1266e8,#6546df);box-shadow:0 3px 9px #2c56ad38}
+button:hover{filter:brightness(1.1)}
+button.secondary{background:#ffe6a3;color:#563900}
+.stat{background:linear-gradient(135deg,#d9f6ff,#eee3ff);border:1px solid #a8c8fa}
+.stat strong{color:#5931c5}
+th{background:#dce9ff;color:#173c86}
+tbody tr:nth-child(even){background:#f1f7ff}
+tbody tr:hover{background:#fff4d8}
+.grand-total th{background:linear-gradient(110deg,#0755cc,#6938d1)!important;color:#fff!important;border-top:4px solid #ffc83d}
+.grand-total #total{color:#fff6a4!important;font-size:31px}
+summary{color:#1749b5}
+@media print{body{background:white}header,.grand-total th{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+
+.error{color:#b32247;font-weight:700;margin:12px 0}.note{font-size:13px;color:#526580;margin:10px 0}.grand-total th{font-size:23px!important}.grand-total #total{font-size:32px!important}.result-placeholder{padding:16px;color:#526580}.panel h2{margin-bottom:18px}@media(max-width:600px){th,td{padding:7px;font-size:12px}.grand-total #total{font-size:23px!important}}
+/* Вирівнювання підписів та полів у всіх сітках */
+.grid{align-items:stretch}
+.grid>label{display:flex;flex-direction:column;justify-content:flex-end;min-width:0;line-height:1.35}
+.grid>label>input,.grid>label>select{margin-top:auto;min-height:45px;flex-shrink:0}
+.grid>label{gap:8px}
+.grid>label>input[readonly]{background:#e7f9f3;border:2px solid #1bbf9c;color:#124e46;font-weight:800;cursor:default}
+
+.grid>label{justify-content:flex-start}.grid>label>input,.grid>label>select{margin-top:auto}.grid>label{min-height:85px}
+</style></head><body>
+<header><h1>Розрахунок матеріалів</h1><p style="font-size:22px;font-weight:800">Команда «Майстри відновлення»</p></header><main>
+<section class="panel"><h2>1. Параметри об'єкта</h2><div class="grid">
+<label>Довжина стіни, м<input id="length" type="number" min="0.1" step="any" placeholder="Введіть довжину"></label>
+<label>Висота стіни, м<input id="height" type="number" min="0.1" step="any" placeholder="Введіть висоту"></label>
+<label>Довжина листа ГКП, м<input id="sheetL" type="number" min="0.1" step="any" placeholder="Введіть довжину"></label>
+<label>Ширина листа ГКП, м<input id="sheetW" type="number" min="0.1" step="any" placeholder="Введіть ширину"></label>
+<label>Тип гіпсокартону<select id="board"><option value="standard">ГКП стандартний 12,5 мм</option><option value="moisture">ГКП вологостійкий 12,5 мм</option><option value="fire">ГКП вогнестійкий 12,5 мм</option></select></label>
+<label>Кількість шарів обшивки<select id="layers"><option value="1">1 шар</option><option value="2">2 шари</option></select></label>
+<label>Проріз у стіні<select id="opening"><option value="no">Без прорізу</option><option value="yes">Є проріз</option></select></label>
+<label>Запас матеріалів, %<input id="reserve" type="number" min="0" max="40" step="any" placeholder="Введіть запас"></label>
+
+</div><div id="openingFields" class="grid" style="display:none;margin-top:14px"><label>Ширина прорізу, м<input id="openingW" type="number" min="0.1" step="any" placeholder="Введіть ширину"></label><label>Висота прорізу, м<input id="openingH" type="number" min="0.1" step="any" placeholder="Введіть висоту"></label></div></section>
+<section class="panel"><h2>2. Параметри каркаса та оздоблення</h2><div class="grid">
+<label>Довжина профілю UD, м<select id="udLen"><option value="3">3 м</option><option value="4">4 м</option></select></label>
+<label>Довжина профілю CD, м<select id="cdLen"><option value="3">3 м</option><option value="4">4 м</option></select></label>
+<label>Тепло- та звукоізоляція<select id="wool"><option value="yes">Мінеральна вата</option><option value="no">Без ізоляції</option></select></label>
+<label>Площа в упаковці мінеральної вати, м²<input id="woolPack" type="number" value="6" readonly></label>
+<label>Витрата декоративної штукатурки, г/м²<input id="plasterRate" type="number" value="400" readonly></label>
+<label>Витрата ґрунтовки, г/м²<input id="primerRate" type="number" value="140" readonly></label>
+</div></section>
+<section class="panel"><h2>3. Результат розрахунку</h2><button id="calculate">Розрахувати матеріали</button><button id="print" class="secondary" type="button">Друк / зберегти PDF</button><button id="csv" class="secondary" type="button">Завантажити CSV</button><div id="error" class="error" role="alert"></div>
+<div id="stats" class="stats" style="display:none;margin:18px 0"><div class="stat">Площа стіни без прорізу<strong id="area">—</strong></div><div class="stat">Площа обшивки (усі шари)<strong id="cover">—</strong></div><div class="stat">Площа оздоблення<strong id="finishArea">—</strong></div></div>
+<div class="scroll"><table><thead><tr><th>Матеріал / комплектувальний виріб</th><th>Одиниця</th><th>Потреба</th><th>До закупівлі</th><th>Фіксована ціна за одиницю, грн</th><th>Сума, грн</th></tr></thead><tbody id="rows"><tr><td colspan="6" class="result-placeholder">Введіть розміри та натисніть «Розрахувати матеріали».</td></tr></tbody><tfoot><tr class="grand-total"><th colspan="5">Разом, грн</th><th id="total">—</th></tr></tfoot></table></div>
+<p class="note">Ціни орієнтовні та призначені для навчального кошторису. Фіксовані навчальні норми витрати декоративної штукатурки та ґрунтовки подано у г/м². Для ґрунтовки перерахунок маси в об’єм орієнтовний (умовно 1 кг ≈ 1 л). Витрату декоративної штукатурки потрібно звірити з обраним продуктом і товщиною шару.</p>
+<details><summary>Методика розрахунку</summary><p class="note">Навчальна модель однорівневого пристінного каркаса з CD 60/27 і UD 28/27, прямими підвісами, кроком CD 600 мм та орієнтовним кроком підвісів 1000 мм. Кількість підвісів і з'єднувачів оцінюється для прямої стіни. Проріз віднімається з площі обшивки, але його обрамлення оцінено додатковими профілями. Норми шпаклювання, кріплення та витрат — навчальні. Остаточний підбір кріплення, відступів, висоти, товщини облицювання, допустимих навантажень та протипожежних рішень виконується за технічною документацією обраної системи і характеристиками основи. Для складних форм і важких навісних предметів потрібен окремий проєкт.</p></details></section>
+<p class="footer">Навчальний калькулятор · Команда «Майстри відновлення»</p></main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const money=n=>n.toLocaleString('uk-UA',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt=n=>n.toLocaleString('uk-UA',{maximumFractionDigits:2});
+const prices={board:{standard:395,moisture:490,fire:520},ud3:65,cd3:110,susp:14,connector:17,dowel:6,tn:0.9,metalScrews:0.65,tapeRoll:75,joint5:125,finish20:410,primer10:430,plaster25:950,woolPack:650,seal30:155};
+let lastRows=[];
+function num(id){const el=$(id);const raw=el.value.trim().replace(',','.');if(!raw)throw Error('Заповніть поле «'+el.closest('label').firstChild.textContent.trim()+'».');const n=Number(raw);if(!Number.isFinite(n)||n<=0)throw Error('Введіть додатне число у полі «'+el.closest('label').firstChild.textContent.trim()+'».');return n;}
+function calc(){try{
+$('error').textContent='';const L=num('length'),H=num('height'),SL=num('sheetL'),SW=num('sheetW');
+const rr=$('reserve').value.trim().replace(',','.');if(rr==='')throw Error('Заповніть поле «Запас матеріалів, %».');const reserve=Number(rr);if(!Number.isFinite(reserve)||reserve<0||reserve>40)throw Error('Запас матеріалів має бути від 0 до 40 %.');
+const opening=$('opening').value==='yes',ow=opening?num('openingW'):0,oh=opening?num('openingH'):0;
+if(opening&&(ow>=L||oh>=H))throw Error('Проріз повинен бути меншим за розміри стіни.');
+const layers=Number($('layers').value),udLen=Number($('udLen').value),cdLen=Number($('cdLen').value);
+if(cdLen<H)throw Error('Оберіть CD-профіль довжиною не меншою за висоту стіни (або передбачте проєктне подовження).');
+const f=1+reserve/100,area=L*H-ow*oh,cover=area*layers,finishArea=area;
+const perimeter=2*(L+H)+(opening?2*oh+ow:0),cdLines=Math.ceil(L/0.6)+1+(opening?2:0);
+const cdMetres=cdLines*H+(opening?ow:0),udMetres=2*(L+H)+(opening?2*oh+ow:0);
+const suspCount=cdLines*Math.max(1,Math.ceil((H-0.3)/1.0)),sheetCount=Math.ceil(cover*f/(SL*SW));
+const cdCount=Math.ceil(cdMetres*f/cdLen),udCount=Math.ceil(udMetres*f/udLen);
+const anchorCount=Math.ceil(udMetres*f/0.5)+suspCount*2;
+const tnCount=Math.ceil(cover*f*(layers===1?22:18));
+const metalCount=Math.ceil((suspCount*2+cdLines*2)*f);
+const tapeM=(finishArea/Math.max(SW,0.3)+perimeter*0.35)*f;
+const jointKg=cover*0.3*f,finishKg=finishArea*1.2*f;
+const plasterKg=finishArea*num('plasterRate')*f/1000,primerKg=finishArea*num('primerRate')*f/1000;
+const wool=$('wool').value==='yes';const woolPack=num('woolPack');
+const rows=[];function add(name,unit,need,buy,price){rows.push({name,unit,need,buy,price,sum:buy*price});}
+add('Гіпсокартонні листи 12,5 мм ('+({standard:'стандартні',moisture:'вологостійкі',fire:'вогнестійкі'}[$('board').value])+')','лист',fmt(cover*f/(SL*SW)),sheetCount,prices.board[$('board').value]);
+add('Напрямний профіль UD 28/27 ('+fmt(udLen)+' м)','шт.',fmt(udMetres*f)+' пог. м',udCount,prices.ud3*udLen/3);
+add('Стельовий профіль CD 60/27 ('+fmt(cdLen)+' м)','шт.',fmt(cdMetres*f)+' пог. м',cdCount,prices.cd3*cdLen/3);
+add('Прямі підвіси для CD','шт.',suspCount,suspCount,prices.susp);
+add('З’єднувачі для CD (за потреби)','шт.',0,0,prices.connector);
+add('Дюбелі та анкери для кріплення каркаса','шт.',anchorCount,anchorCount,prices.dowel);
+add('Ущільнювальна стрічка під UD (рулон 30 м)','рулон',fmt(udMetres*f)+' м',Math.ceil(udMetres*f/30),prices.seal30);
+add('Шурупи TN для кріплення ГКП','шт.',tnCount,tnCount,prices.tn);
+add('Шурупи для металевих з’єднань','шт.',metalCount,metalCount,prices.metalScrews);
+if(wool)add('Мінеральна вата (упаковка '+fmt(woolPack)+' м²)','упак.',fmt(area*f)+' м²',Math.ceil(area*f/woolPack),prices.woolPack);
+add('Армувальна стрічка для швів (рулон 50 м)','рулон',fmt(tapeM)+' м',Math.ceil(tapeM/50),prices.tapeRoll);
+add('Шпаклівка для швів (упаковка 5 кг)','упак.',fmt(jointKg)+' кг',Math.ceil(jointKg/5),prices.joint5);
+add('Фінішна шпаклівка (упаковка 20 кг)','упак.',fmt(finishKg)+' кг',Math.ceil(finishKg/20),prices.finish20);
+add('Ґрунтовка (каністра 10 л)','каністра',fmt(primerKg)+' кг ≈ л',Math.ceil(primerKg/10),prices.primer10);
+add('Декоративна штукатурка (відро 25 кг)','відро',fmt(plasterKg)+' кг',Math.ceil(plasterKg/25),prices.plaster25);
+lastRows=rows;$('rows').replaceChildren();for(const r of rows){const tr=document.createElement('tr');for(const v of [r.name,r.unit,String(r.need),String(r.buy),money(r.price),money(r.sum)]){const td=document.createElement('td');td.textContent=v;tr.append(td)}$('rows').append(tr)}
+$('total').textContent=money(rows.reduce((s,r)=>s+r.sum,0));$('area').textContent=fmt(area)+' м²';$('cover').textContent=fmt(cover)+' м²';$('finishArea').textContent=fmt(finishArea)+' м²';$('stats').style.display='grid';
+}catch(e){$('error').textContent=e.message;}}
+$('opening').addEventListener('change',()=>{$('openingFields').style.display=$('opening').value==='yes'?'grid':'none'});
+$('calculate').addEventListener('click',calc);
+$('print').addEventListener('click',()=>{if(!lastRows.length){$('error').textContent='Спочатку виконайте розрахунок.';return}window.print()});
+$('csv').addEventListener('click',()=>{if(!lastRows.length){$('error').textContent='Спочатку виконайте розрахунок.';return}const lines=[['Матеріал','Одиниця','Потреба','До закупівлі','Ціна, грн','Сума, грн'],...lastRows.map(r=>[r.name,r.unit,r.need,r.buy,r.price,r.sum]),['Разом','','','','',lastRows.reduce((s,r)=>s+r.sum,0)]];const esc=v=>'"'+String(v).replaceAll('"','""')+'"';const csv='\ufeff'+lines.map(r=>r.map(esc).join(';')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='maistry_vidnovlennia_materialy.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)});
+</script></body></html>
